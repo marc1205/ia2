@@ -1,27 +1,46 @@
 (deffacts BH
 
     (maxCajas 1)
-    (problema pedidos pedido naranjas 3 pedido manzanas 3 pedido uvas 1 lineaPedido robot cajasActuales 0 cajas)
+    (problema bloques bloque tipo A bloque tipo B bloque tipo C bloque tipo D bloque tipo E robot cajasActuales 0 cajas)
+)
+
+(defrule comprobarBloques
+    (declare (salience 60))
+    (problema bloques $?iniBloque bloque ?tipoBloque ?cuantosCajas $?finBloque  $?resto)
+    (test (= ?cuantosCajas 0))
+    =>
+    (assert(problema bloques $?iniBloque $?finBloque  $?resto))
+
+)
+
+(defrule comprobarFinal
+    (declare (salience 100))
+    (problema bloques $?bloque lineaBloque $?resto)
+    (test (= (length$ $?bloque) 0))
+    =>
+    (printout t "FIN===========" crlf)
+    (halt)
+
 )
 
 (defrule cogerCaja
     (declare (salience 50))
     (maxCajas ?numCajas)
-    (problema pedidos $?iniPedido pedido ?tipoPale ?cuantosPedido $?finPedido lineaPedido $?lineaPedido robot cajasActuales ?cajasActuales cajas $?cajas)
-    (test (< ?cajasActuales ?numCajas )) ; no puede llevar mas del tope
-    (test (> ?stockPale 0))
-    (test (> ?cuantosPedido 0)) ; que el pedido aun le queden
+    (problema bloques $?iniBloque c ?tipoBloque ?cuantosCajas $?finBloque lineaBloque $?lineaBloque robot cajasActuales ?cajasActuales cajas $?cajas)
+    (test (< ?cajasActuales ?numCajas )) 
+    (test (> ?stockCaja 0))
+    (test (> ?cuantosCajas 0)) 
     =>
-    (assert (problema pedidos $?iniPedido pedido ?tipoPale ?cuantosPedido $?finPedido lineaPedido $?lineaPedido robot cajasActuales (+ ?cajasActuales 1) cajas $?cajas ?tipoPale pales $?ini pale ?tipoPale (- ?stockPale 1) $?fin))
+    (assert (problema bloques $?iniBloque tipo ?tipoBloque ?cuantosCajas $?finBloque lineaBloque $?lineaBloque robot cajasActuales (+ ?cajasActuales 1) cajas $?cajas ?tipoBloque (- ?stockCaja 1) $?fin))
 )
 
 (defrule dejarCaja
     (declare (salience 60))
-    (problema pedidos $?iniPedido pedido ?tipoPale ?cuantosPedido $?finPedido lineaPedido $?lineaPedido robot cajasActuales ?cajasActuales cajas ?caja $?cajas pales $?pales)
-    (test (eq ?tipoPale ?caja))
+    (problema bloques $?iniBloque tipo ?tipoBloque ?cuantosCajas $?finBloque lineaBloque $?lineaBloque robot cajasActuales ?cajasActuales cajas ?caja $?cajas)
+    (test (eq ?tipoBloque ?caja))
     (test (> ?cajasActuales 0))
     =>
-    (assert (problema pedidos $?iniPedido pedido ?tipoPale (- ?cuantosPedido 1) $?finPedido lineaPedido $?lineaPedido ?caja robot cajasActuales (- ?cajasActuales 1) cajas $?cajas pales $?pales))
+    (assert (problema bloques $?iniBloque tipo ?tipoBloque (- ?cuantosCajas 1) $?finBloque lineaBloque $?lineaBloque ?caja robot cajasActuales (- ?cajasActuales 1) cajas $?cajas))
 
 )
 
